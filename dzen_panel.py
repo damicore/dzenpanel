@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 
+import time
 import sys
 import string
 import os
@@ -14,10 +15,12 @@ def parse_tags(output):
     taglist = ''
     for i in range(len(tags)):
         if tags[i][0] == '#':
-            s = '^bg(' + colors[3] + ')' + tags[i][1:] + ' '
+            s = '^bg(' + colors[11] + ') ' + tags[i][1:] + ' '
             taglist += s
         elif tags[i][0] == ':':
-            taglist += '^bg(' + colors[4] + ')' + tags[i][1:] + ' '
+            taglist += '^bg(' + colors[17] + ') ' + tags[i][1:] + ' '
+        elif tags[i][0] == '.' or '!':
+            taglist += '^bg(' + colors[3] + ') ' + tags[i][1:] + ' '
     return taglist
 
 def parse_xdef():
@@ -35,24 +38,35 @@ def parse_xdef():
             colors.append(color[color.find('#'):])
     return(colors)
 
+def print_colors(colors):
+    res = ''
+    for i in range(len(colors)):
+        res +='^bg(' + colors[i] + ')' + str(i)
+    return res
+
+def get_date():
+    return time.strftime('%a %d %b %Y %R')
+
 colors = parse_xdef()
 single_line_out = ''
 idlein = os.popen(idle_cmd)
 #for line in idlein:
-#while True:
-line = idlein.readline()
-    #if 'tag' in line:
+#next to function
 proc = os.popen(status_cmd)
 output = proc.readline()
 taglist = parse_tags(output)
-single_line_out = taglist + ' hola'
-sys.stdout.write(single_line_out)
-
-#while True:
-    #idlein = os.popen(idle_cmd)
-    #print(idlein.readline())
-    #if 'tag' in event:
-    #proc = os.popen(status_cmd)
-    #output = proc.readline()
-    #taglist = parse_tags(output)
-    #print(taglist)
+single_line_out = taglist
+print(single_line_out)
+sys.stdout.flush()
+#till here
+while True:
+    line = idlein.readline()
+    if 'tag' in line:
+        #from
+        proc = os.popen(status_cmd)
+        output = proc.readline()
+        taglist = parse_tags(output)
+        single_line_out = taglist
+        print(single_line_out)
+        sys.stdout.flush()
+        #to
