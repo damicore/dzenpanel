@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 
+import threading
 import time
 import sys
 import string
@@ -15,12 +16,11 @@ def parse_tags(output):
     taglist = ''
     for i in range(len(tags)):
         if tags[i][0] == '#':
-            s = '^bg(' + colors[11] + ') ' + tags[i][1:] + ' '
-            taglist += s
+            taglist += '^bg(' + colors[11] + ') ' + tags[i][1:] + ' '
         elif tags[i][0] == ':':
             taglist += '^bg(' + colors[17] + ') ' + tags[i][1:] + ' '
         elif tags[i][0] == '.' or '!':
-            taglist += '^bg(' + colors[3] + ') ' + tags[i][1:] + ' '
+            taglist += '^bg(' + colors[2] + ') ' + tags[i][1:] + ' '
     return taglist
 
 def parse_xdef():
@@ -47,26 +47,37 @@ def print_colors(colors):
 def get_date():
     return time.strftime('%a %d %b %Y %R')
 
+def get_event():
+    #rename, clean up
+    proc = os.popen(status_cmd)
+    output = proc.readline()
+    taglist = parse_tags(output)
+    print(taglist, '^bg(' + colors[3] + ') ', get_date()) #, print_colors(colors) ///also, print time here?
+    sys.stdout.flush()
+
+def event_thread():
+    get_event()
+    while True:
+        line = idlein.readline()
+        if 'tag' in line:
+            get_event()
+
+def timer_thread():
+    while True:
+        get_event()
+        time.sleep(1)
+    return o
+
+def main_thread():
+    """docstring for main_thread"""
+    t1 = threading.Thread(target=event_thread)
+    t2 = threading.Thread(target=timer_thread)
+    t1.start()
+    t2.start()
+
 colors = parse_xdef()
 single_line_out = ''
 idlein = os.popen(idle_cmd)
-#for line in idlein:
-#next to function
-proc = os.popen(status_cmd)
-output = proc.readline()
-taglist = parse_tags(output)
-single_line_out = taglist
-print(single_line_out)
-sys.stdout.flush()
-#till here
-while True:
-    line = idlein.readline()
-    if 'tag' in line:
-        #from
-        proc = os.popen(status_cmd)
-        output = proc.readline()
-        taglist = parse_tags(output)
-        single_line_out = taglist
-        print(single_line_out)
-        sys.stdout.flush()
-        #to
+
+if __name__ == '__main__':
+    main_thread()
