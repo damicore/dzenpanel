@@ -20,7 +20,7 @@ def parse_tags(output):
         elif tags[i][0] == ':':
             taglist += '^bg(' + colors[17] + ') ' + tags[i][1:] + ' '
         elif tags[i][0] == '.' or '!':
-            taglist += '^bg(' + colors[2] + ') ' + tags[i][1:] + ' '
+            taglist += '^bg(' + colors[1] + ') ' + tags[i][1:] + ' '
     return taglist
 
 def parse_xres():
@@ -64,7 +64,7 @@ def get_event():
     proc = os.popen(status_cmd)
     output = proc.readline()
     taglist = parse_tags(output)
-    print(taglist, '^bg(' + colors[3] + ') ', get_date(), ' ', '^bg(' + colors[3] + ') ', get_battery()) #, print_colors(colors) ///also, print time here?
+    print(taglist, '^bg(' + colors[1] + ') ', get_date(), ' ', '^bg(' + colors[1] + ')Bat:', get_battery()) #, print_colors(colors) ///also, print time here?
     sys.stdout.flush()
 
 def event_thread():
