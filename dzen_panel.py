@@ -23,7 +23,7 @@ def parse_tags(output):
             taglist += '^bg(' + colors[2] + ') ' + tags[i][1:] + ' '
     return taglist
 
-def parse_xdef():
+def parse_xres():
     os.chdir('/home/damian/')
     fin = open('.Xresources')
     colors = []
@@ -47,12 +47,24 @@ def print_colors(colors):
 def get_date():
     return time.strftime('%a %d %b %Y %R')
 
+def get_battery():
+    fin = open('/sys/class/power_supply/BAT1/uevent')
+    full = 0
+    now = 0
+    for line in fin.readlines():
+        if line[13:25] == 'CHARGE_FULL=':
+            full = int(line[25:])
+        elif line[13:23] == 'CHARGE_NOW':
+            now = int(line[24:])
+    res = str(now / full * 100) + '%'
+    return res
+
 def get_event():
     #rename, clean up
     proc = os.popen(status_cmd)
     output = proc.readline()
     taglist = parse_tags(output)
-    print(taglist, '^bg(' + colors[3] + ') ', get_date()) #, print_colors(colors) ///also, print time here?
+    print(taglist, '^bg(' + colors[3] + ') ', get_date(), ' ', '^bg(' + colors[2] + ') ', get_battery()) #, print_colors(colors) ///also, print time here?
     sys.stdout.flush()
 
 def event_thread():
@@ -75,7 +87,7 @@ def main_thread():
     t1.start()
     t2.start()
 
-colors = parse_xdef()
+colors = parse_xres()
 single_line_out = ''
 idlein = os.popen(idle_cmd)
 
