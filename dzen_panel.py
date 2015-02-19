@@ -64,7 +64,7 @@ def get_event():
     proc = os.popen(status_cmd)
     output = proc.readline()
     taglist = parse_tags(output)
-    print(taglist, '^bg(' + colors[3] + ') ', get_date(), ' ', '^bg(' + colors[2] + ') ', get_battery()) #, print_colors(colors) ///also, print time here?
+    print(taglist, '^bg(' + colors[3] + ') ', get_date(), ' ', '^bg(' + colors[3] + ') ', get_battery()) #, print_colors(colors) ///also, print time here?
     sys.stdout.flush()
 
 def event_thread():
@@ -73,6 +73,8 @@ def event_thread():
         line = idlein.readline()
         if 'tag' in line:
             get_event()
+        elif 'reload' in line:
+            os._exit(0) #Extremely hacky, the interpreter doesn't free up res's
 
 def timer_thread():
     while True:
