@@ -48,16 +48,19 @@ def get_date():
     return time.strftime('%a %d %b %Y %R')
 
 def get_battery():
-    fin = open('/sys/class/power_supply/BAT1/uevent')
-    full = 0
-    now = 0
-    for line in fin.readlines():
-        if line[13:25] == 'CHARGE_FULL=':
-            full = int(line[25:])
-        elif line[13:23] == 'CHARGE_NOW':
-            now = int(line[24:])
-    res = str(now / full * 100) + '%'
-    return res
+    try:
+        fin = open('/sys/class/power_supply/BAT1/uevent')
+        full = 0
+        now = 0
+        for line in fin.readlines():
+            if line[13:25] == 'CHARGE_FULL=':
+                full = int(line[25:])
+            elif line[13:23] == 'CHARGE_NOW':
+                now = int(line[24:])
+        res = str(now / full * 100) + '%'
+        return res
+    except:
+        return 'No'
 
 def get_event():
     #rename, clean up
@@ -66,6 +69,7 @@ def get_event():
     taglist = parse_tags(output)
     print(taglist, '^bg(' + colors[1] + ') ', get_date(), ' ', '^bg(' + colors[1] + ')Bat:', get_battery()) #, print_colors(colors) ///also, print time here?
     sys.stdout.flush()
+    proc.close()
 
 def event_thread():
     get_event()
@@ -74,6 +78,7 @@ def event_thread():
         if 'tag' in line:
             get_event()
         elif 'reload' in line:
+            idlein.close()
             os._exit(0) #Extremely hacky, the interpreter doesn't free up res's
 
 def timer_thread():
