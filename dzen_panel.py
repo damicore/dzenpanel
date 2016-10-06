@@ -67,7 +67,7 @@ def get_event():
     proc = os.popen(status_cmd)
     output = proc.readline()
     taglist = parse_tags(output)
-    print(taglist, '^bg(' + colors[1] + ') ', get_date(), ' ', '^bg(' + colors[1] + ')Bat:', get_battery()) #, print_colors(colors) ///also, print time here?
+    print  taglist + '^bg(' + colors[1] + ') ' + get_date() + ' ' + '^bg(' + colors[1] + ')Bat: ' + get_battery() #, print_colors(colors)
     sys.stdout.flush()
     proc.close()
 
